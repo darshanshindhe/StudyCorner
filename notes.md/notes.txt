@@ -1,0 +1,42 @@
+# StudyCorner: Project Notes
+
+## Oct 19, 2026 (Day 1)
+
+### Setup done
+- Installed Git, VS Code and the Python extension.
+- Created the GitHub repo `studycorner` and cloned it to `C:\StudyCorner\StudyCorner`.
+- Created a virtual environment and installed: pymupdf, sentence-transformers, chromadb, streamlit, python-dotenv.
+- Created the folder structure: `data/pdfs/`, `src/`, `notes.md`, `README.md`.
+- Added `venv/`, `.env`, `data/pdfs/`, `chroma_db/` to `.gitignore`.
+
+### Problems faced and fixes
+- **Problem:** `pip install pymupdf` failed with a long build error (cmake, ninja, swig).
+- **Cause:** My venv was using Python 3.14, which is too new. Libraries like PyMuPDF had no prebuilt installer (wheel) for it, so pip tried to build from source, which needs C++ build tools.
+- **Fix:** Installed Python 3.12, deleted the old venv, created a new one with `py -3.12 -m venv venv`, then reinstalled.
+- **Lesson:** ML libraries lag behind the newest Python version. Always check `python --version` before creating a venv.
+- **Problem:** `FutureWarning: fitz API is deprecated`.
+- **Fix:** Changed `import fitz` to `import pymupdf as fitz`.
+
+### Built: `src/ingestion.py`
+- Extracts text page by page using PyMuPDF.
+- Each page is stored as `{source, page, text}`, so I can show citations (file name + page number) later.
+
+### Results of running ingestion
+- First run: 2 microprocessor PDFs, 46 pages with text (Module 1 gave only 4 pages, so the rest are probably image-only).
+- Second run: 2 finance PDFs (Module 2 EOF: 13 pages, Unit I notes: 33 pages), 46 pages in total.
+- The text came out clean and readable.
+
+### Observations and limitations (important for README and interviews)
+1. **Text inside images is not read.** In the finance notes, the NPV and IRR formulas and some tables are images, so only the surrounding text is extracted. A question like "what is the NPV formula?" can only be answered from the words around it. Possible fix: OCR or a vision LLM (Level 2 or 3 upgrade).
+2. **Tables extract as broken lines.** Comparison tables lose their row/column structure. This may confuse the LLM. Need to test later.
+3. **Lecture slides have a two-column problem.** In the microprocessor slides, two columns (data addressing vs memory addressing) get mixed line by line. Paragraph-style notes work better than slides for chunking.
+4. **Page breaks merge sections.** Text like "inefficiencies.(c) Large Amount of Funds" shows that a section spanning two pages gets split, and headers or footers mix into the text.
+5. **No fully scanned pages were detected** by the Level 1 check, so OCR is a nice-to-have, not a must-have.
+
+### Decisions made
+- Using Python + Streamlit + PyMuPDF + sentence-transformers + ChromaDB.
+- Keep `chunk_size` and `overlap` as parameters so I can compare sizes in the evaluation.
+- Build the core pipeline first (until about day 10), and add OCR only if time allows.
+
+### Git
+- Committed: "Add PDF ingestion script"

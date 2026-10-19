@@ -1,4 +1,4 @@
-import fitz  # PyMuPDF
+import pymupdf as fitz  # PyMuPDF
 from pathlib import Path
 
 def extract_pages(pdf_path):
