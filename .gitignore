@@ -1,0 +1,4 @@
+venv/
+.env
+data/pdfs/
+chroma_db/
